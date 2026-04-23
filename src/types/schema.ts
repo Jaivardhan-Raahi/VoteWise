@@ -22,6 +22,13 @@ export const RaceSchema = z.object({
   candidates: z.array(z.string()), // Array of Candidate IDs
 });
 
+export const IssueSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+});
+
 export type Stance = z.infer<typeof StanceSchema>;
 export type Candidate = z.infer<typeof CandidateSchema>;
 export type Race = z.infer<typeof RaceSchema>;
+export type Issue = z.infer<typeof IssueSchema>;

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "climate",
+    "name": "Climate Change",
+    "description": "Policies regarding environmental protection, carbon emissions, and renewable energy."
+  },
+  {
+    "id": "economy",
+    "name": "Economy",
+    "description": "Fiscal policies, taxation, job creation, and economic growth strategies."
+  },
+  {
+    "id": "education",
+    "name": "Education",
+    "description": "Funding for schools, student loans, and educational standards."
+  }
+]
