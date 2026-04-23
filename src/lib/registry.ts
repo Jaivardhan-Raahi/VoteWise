@@ -12,77 +12,77 @@ let validatedCandidates: Candidate[] | null = null;
 let validatedRaces: Race[] | null = null;
 let validatedIssues: Issue[] | null = null;
 
+/**
+ * Safely validates data using Zod.
+ * Returns fallback if validation fails in production.
+ */
+function safeValidate<T>(schema: z.ZodSchema<T>, data: any, name: string): T {
+  try {
+    return schema.parse(data);
+  } catch (error) {
+    console.error(`Registry Validation Error [${name}]:`, error);
+    // In production, we might want to return an empty array/object instead of crashing
+    if (Array.isArray(data)) return [] as unknown as T;
+    return {} as unknown as T;
+  }
+}
+
 function getValidatedCandidates(): Candidate[] {
   if (!validatedCandidates) {
-    validatedCandidates = CandidatesArraySchema.parse(candidatesData);
+    validatedCandidates = safeValidate(CandidatesArraySchema, candidatesData, "Candidates");
   }
   return validatedCandidates;
 }
 
 function getValidatedRaces(): Race[] {
   if (!validatedRaces) {
-    validatedRaces = RacesArraySchema.parse(racesData);
+    validatedRaces = safeValidate(RacesArraySchema, racesData, "Races");
   }
   return validatedRaces;
 }
 
 function getValidatedIssues(): Issue[] {
   if (!validatedIssues) {
-    validatedIssues = IssuesArraySchema.parse(issuesData);
+    validatedIssues = safeValidate(IssuesArraySchema, issuesData, "Issues");
   }
   return validatedIssues;
 }
 
-/**
- * Returns all races from the registry.
- */
 export function getRaces(): Race[] {
   return getValidatedRaces();
 }
 
-/**
- * Returns candidates participating in a specific race.
- */
 export function getCandidatesForRace(raceId: string): Candidate[] {
   const races = getValidatedRaces();
   const race = races.find((r) => r.id === raceId);
-  if (!race) return [];
+  if (!race) {
+    console.warn(`Race not found in registry: ${raceId}`);
+    return [];
+  }
 
   const allCandidates = getValidatedCandidates();
   return allCandidates.filter((c) => race.candidates.includes(c.id));
 }
 
-/**
- * Returns a specific candidate by ID.
- */
 export function getCandidateById(candidateId: string): Candidate | undefined {
-  const allCandidates = getValidatedCandidates();
-  return allCandidates.find((c) => c.id === candidateId);
+  return getValidatedCandidates().find((c) => c.id === candidateId);
 }
 
-/**
- * Returns all issues from the registry.
- */
 export function getIssues(): Issue[] {
   return getValidatedIssues();
 }
 
-/**
- * Returns a specific issue by ID.
- */
 export function getIssueById(issueId: string): Issue | undefined {
-  const allIssues = getValidatedIssues();
-  return allIssues.find((i) => i.id === issueId);
+  return getValidatedIssues().find((i) => i.id === issueId);
 }
 
-/**
- * Returns unique issues mentioned by candidates in a specific race.
- */
 export function getIssuesByRace(raceId: string): Issue[] {
   const candidates = getCandidatesForRace(raceId);
+  if (candidates.length === 0) return [];
+
   const issueIds = new Set<string>();
   candidates.forEach((c) => {
-    c.stances.forEach((s) => issueIds.add(s.issueId));
+    c.stances?.forEach((s) => issueIds.add(s.issueId));
   });
 
   const allIssues = getValidatedIssues();

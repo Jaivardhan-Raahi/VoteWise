@@ -10,33 +10,51 @@ export interface CandidateStance {
 }
 
 /**
- * Calculates alignment percentage using simple weighted sum algorithm.
- * 100 * (1 - (sumWeightedDiff / maxSumWeightedDiff))
- * where diff = abs(userValue - candidateValue)
- * and maxSumWeightedDiff = sum(10 * weight)
+ * Calculates alignment percentage between user and candidate stances.
+ * Uses a weighted distance algorithm.
+ * 
+ * @param userStances Array of user stances with values and weights
+ * @param candidateStances Array of candidate stances for the same issues
+ * @returns A number between 0 and 100 representing alignment percentage
  */
 export function calculateAlignment(
-  userStances: UserStance[],
-  candidateStances: CandidateStance[]
+  userStances: UserStance[] | undefined | null,
+  candidateStances: CandidateStance[] | undefined | null
 ): number {
-  if (userStances.length === 0) return 0;
-
-  let sumWeightedDiff = 0;
-  let maxSumWeightedDiff = 0;
-
-  for (const userStance of userStances) {
-    const candidateStance = candidateStances.find(
-      (cs) => cs.issueId === userStance.issueId
-    );
-
-    if (!candidateStance) continue;
-
-    const diff = Math.abs(userStance.value - candidateStance.value);
-    sumWeightedDiff += diff * userStance.weight;
-    maxSumWeightedDiff += 10 * userStance.weight;
+  // Defensive check for empty or null inputs
+  if (!userStances || !candidateStances || userStances.length === 0) {
+    return 0;
   }
 
-  if (maxSumWeightedDiff === 0) return 0;
+  let totalWeightedDifference = 0;
+  let totalPossibleDifference = 0;
 
-  return Math.round(100 * (1 - sumWeightedDiff / maxSumWeightedDiff));
+  for (const userStance of userStances) {
+    // Skip invalid stances
+    if (!userStance || typeof userStance.value !== "number") continue;
+
+    const candidateStance = candidateStances.find(
+      (cs) => cs && cs.issueId === userStance.issueId
+    );
+
+    // If candidate has no stance on this issue, we skip it to be fair
+    if (!candidateStance || typeof candidateStance.value !== "number") {
+      continue;
+    }
+
+    const weight = Math.max(0, userStance.weight || 0);
+    const difference = Math.abs(userStance.value - candidateStance.value);
+    
+    totalWeightedDifference += difference * weight;
+    totalPossibleDifference += 10 * weight; // Assuming max value difference is 10 (0 to 10 scale)
+  }
+
+  // Avoid division by zero if no matching issues were found or all weights are zero
+  if (totalPossibleDifference <= 0) {
+    return 0;
+  }
+
+  const alignmentScore = 1 - (totalWeightedDifference / totalPossibleDifference);
+  
+  return Math.round(alignmentScore * 100);
 }

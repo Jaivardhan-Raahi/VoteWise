@@ -27,7 +27,7 @@ export default function LandingPage() {
 
         <footer className="pt-12 border-t border-zinc-100">
           <p className="text-sm font-semibold text-zinc-400 uppercase tracking-widest">
-            100% Client-side. Your data stays on your device.
+            Privacy First. Results are anonymized for community insights.
           </p>
         </footer>
       </div>

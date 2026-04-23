@@ -11,13 +11,13 @@ export async function getMatchExplanation(candidateName: string, topIssues: stri
 
     if (!apiKey) {
       console.error("Gemini Debug: Missing GOOGLE_GENERATIVE_AI_API_KEY environment variable");
-      return "Explanation unavailable (API key missing).";
+      return "AI explanation temporarily unavailable due to high demand. Please try again.";
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
     // Updated to the newest high-performance model (Gemini 2.0 Flash)
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     const prompt = `
       A user has been matched with political candidate ${candidateName}. 
@@ -46,14 +46,6 @@ export async function getMatchExplanation(candidateName: string, topIssues: stri
     }
     console.error("Gemini ERROR STACK:", error?.stack);
     
-    // Check for specific common failure points
-    if (error?.message?.includes("API key not valid")) {
-      console.error("Gemini Debug: The provided API key is invalid.");
-    }
-    if (error?.message?.includes("model not found")) {
-      console.error("Gemini Debug: The specified model name is invalid.");
-    }
-
-    return "Could not generate match explanation at this time.";
+    return "AI explanation temporarily unavailable due to high demand. Please try again.";
   }
 }

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Issue } from "../types/schema";
-import { useSurveyStore } from "../store/useSurveyStore";
+import { useSurveyStore, DEFAULT_STANCE_VALUE, DEFAULT_WEIGHT_VALUE } from "../store/useSurveyStore";
 
 interface QuestionCardProps {
   issue: Issue;
@@ -13,8 +13,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ issue }) => {
   const setAnswer = useSurveyStore((state) => state.setAnswer);
   const setWeight = useSurveyStore((state) => state.setWeight);
 
-  const value = response?.value ?? 5;
-  const weight = response?.weight ?? 2;
+  const value = response?.value ?? DEFAULT_STANCE_VALUE;
+  const weight = response?.weight ?? DEFAULT_WEIGHT_VALUE;
 
   const weights = [
     { label: "Low", value: 1 },

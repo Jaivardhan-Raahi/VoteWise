@@ -2,6 +2,10 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { SurveyState, SurveyActions } from "../types/survey";
 
+// Constants to avoid magic numbers
+export const DEFAULT_STANCE_VALUE = 5; // Neutral
+export const DEFAULT_WEIGHT_VALUE = 2; // Medium
+
 export const useSurveyStore = create<SurveyState & SurveyActions>()(
   persist(
     (set) => ({
@@ -15,7 +19,7 @@ export const useSurveyStore = create<SurveyState & SurveyActions>()(
             ...state.responses,
             [issueId]: {
               value,
-              weight: state.responses[issueId]?.weight ?? 2, // Default to Medium (2)
+              weight: state.responses[issueId]?.weight ?? DEFAULT_WEIGHT_VALUE,
             },
           },
         })),
@@ -25,7 +29,7 @@ export const useSurveyStore = create<SurveyState & SurveyActions>()(
           responses: {
             ...state.responses,
             [issueId]: {
-              value: state.responses[issueId]?.value ?? 5, // Default to Neutral (5)
+              value: state.responses[issueId]?.value ?? DEFAULT_STANCE_VALUE,
               weight,
             },
           },

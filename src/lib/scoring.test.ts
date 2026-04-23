@@ -23,11 +23,6 @@ describe("calculateAlignment", () => {
   });
 
   it("should respect weights correctly", () => {
-    // Two issues. 
-    // Issue 1: Match (User 10, Cand 10) - Weight High (3)
-    // Issue 2: Mismatch (User 10, Cand 0) - Weight Low (1)
-    // Total weight = 4. 
-    // Contribution: (3 * 100%) + (1 * 0%) = 300 / 4 = 75%
     const userStances = [
       { issueId: "1", value: 10, weight: 3 },
       { issueId: "2", value: 10, weight: 1 },
@@ -43,7 +38,51 @@ describe("calculateAlignment", () => {
   it("should handle neutral stances (5)", () => {
     const userStances = [{ issueId: "1", value: 5, weight: 1 }];
     const candidateStances = [{ issueId: "1", value: 10 }];
-    // Difference is 5 out of 10. Alignment 50%.
     expect(calculateAlignment(userStances, candidateStances)).toBe(50);
+  });
+
+  it("should return 0 for empty user stances", () => {
+    expect(calculateAlignment([], [{ issueId: "1", value: 10 }])).toBe(0);
+  });
+
+  it("should return 0 when no issues match", () => {
+    const userStances = [{ issueId: "1", value: 10, weight: 1 }];
+    const candidateStances = [{ issueId: "2", value: 10 }];
+    expect(calculateAlignment(userStances, candidateStances)).toBe(0);
+  });
+
+  it("should handle weights of zero", () => {
+    const userStances = [
+      { issueId: "1", value: 10, weight: 0 },
+      { issueId: "2", value: 10, weight: 1 },
+    ];
+    const candidateStances = [
+      { issueId: "1", value: 0 },
+      { issueId: "2", value: 10 },
+    ];
+    // Issue 1 is ignored due to 0 weight. Issue 2 is a perfect match.
+    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
+  });
+
+  it("should handle missing candidate stances gracefully", () => {
+    const userStances = [
+      { issueId: "1", value: 10, weight: 1 },
+      { issueId: "2", value: 10, weight: 1 },
+    ];
+    const candidateStances = [{ issueId: "1", value: 10 }];
+    // Only Issue 1 is scored.
+    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
+  });
+
+  it("should handle extreme values correctly", () => {
+    const userStances = [
+      { issueId: "1", value: 10, weight: 100 },
+      { issueId: "2", value: 0, weight: 100 },
+    ];
+    const candidateStances = [
+      { issueId: "1", value: 10 },
+      { issueId: "2", value: 0 },
+    ];
+    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
   });
 });
