@@ -28,7 +28,9 @@
   1. User can navigate a multi-step survey using a 0-10 scale.
   2. User can assign importance weights (Low/Med/High) to specific issues.
   3. Survey state persists locally in the browser and survives page refreshes (Privacy-First).
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 02-01-PLAN.md — Establish the persistent survey state and issue metadata.
+- [ ] 02-02-PLAN.md — Implement the survey wizard UI and question components.
 
 ### Phase 3: Warm Civic UI
 **Goal**: Implement the "Warm Civic Minimalist" design system and responsive layout.
@@ -56,6 +58,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Candidate Data | 2/2 | Completed | 2026-04-23 |
-| 2. Survey Core | 0/1 | Not started | - |
+| 2. Survey Core | 0/2 | Not started | - |
 | 3. Warm Civic UI | 0/1 | Not started | - |
 | 4. Alignment Results & Comparison | 0/1 | Not started | - |
