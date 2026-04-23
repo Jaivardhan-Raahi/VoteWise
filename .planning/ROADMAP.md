@@ -9,21 +9,23 @@
 ## Phase Details
 
 ### Phase 1: Foundation & Candidate Data
-**Goal**: Establish the core data strategy and initial location-to-race mapping.
+**Goal**: Establish the core data strategy and matching logic.
 **Depends on**: Nothing
-**Requirements**: LOC-01, LOC-02, ALGN-01, DATA-01, DATA-02
+**Requirements**: LOC-01, ALGN-01, DATA-01, DATA-02
 **Success Criteria** (what must be TRUE):
-  1. User can enter a ZIP code/address and receive a list of relevant political races.
-  2. Scoring engine calculates alignment percentages accurately based on candidate data and mock user inputs.
+  1. User can retrieve a hardcoded list of political races and their candidates.
+  2. Scoring engine calculates alignment percentages accurately based on candidate data (0-10 scale).
   3. Candidate data schema includes verified source URLs for all political stances.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 01-01-PLAN.md — Initialize Next.js 15 project and define data schemas/seed data.
+- [ ] 01-02-PLAN.md — Implement alignment scoring engine and data registry utility.
 
 ### Phase 2: Survey Core
 **Goal**: Implement the primary user interaction for capturing political stances.
 **Depends on**: Phase 1
 **Requirements**: SURV-01, SURV-02, SURV-03
 **Success Criteria** (what must be TRUE):
-  1. User can navigate a multi-step survey using a 5-point Likert scale.
+  1. User can navigate a multi-step survey using a 0-10 scale.
   2. User can assign importance weights (Low/Med/High) to specific issues.
   3. Survey state persists locally in the browser and survives page refreshes (Privacy-First).
 **Plans**: TBD
@@ -53,7 +55,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Candidate Data | 0/1 | Not started | - |
+| 1. Foundation & Candidate Data | 0/2 | Not started | - |
 | 2. Survey Core | 0/1 | Not started | - |
 | 3. Warm Civic UI | 0/1 | Not started | - |
 | 4. Alignment Results & Comparison | 0/1 | Not started | - |
