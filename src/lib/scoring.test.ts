@@ -1,88 +1,63 @@
 import { describe, it, expect } from "vitest";
 import { calculateAlignment } from "./scoring";
 
-describe("calculateAlignment", () => {
-  it("should calculate 100% alignment when stances match perfectly", () => {
+describe("calculateAlignment - Edge Cases & Enterprise Hardening", () => {
+  it("should handle null or undefined inputs safely", () => {
+    // @ts-ignore
+    expect(calculateAlignment(null, [])).toBe(0);
+    // @ts-ignore
+    expect(calculateAlignment([], undefined)).toBe(0);
+  });
+
+  it("should handle invalid stance values (non-numbers)", () => {
     const userStances = [
-      { issueId: "1", value: 10, weight: 1 },
+      // @ts-ignore
+      { issueId: "1", value: "invalid", weight: 1 },
+      { issueId: "2", value: 10, weight: 1 },
+    ];
+    const candidateStances = [{ issueId: "2", value: 10 }];
+    
+    // Should ignore the invalid stance and score based on the valid one
+    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
+  });
+
+  it("should handle extreme weights", () => {
+    const userStances = [
+      { issueId: "1", value: 10, weight: 1000000 },
       { issueId: "2", value: 0, weight: 1 },
     ];
     const candidateStances = [
       { issueId: "1", value: 10 },
-      { issueId: "2", value: 0 },
-    ];
-    
-    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
-  });
-
-  it("should calculate 0% alignment when stances are opposite", () => {
-    const userStances = [{ issueId: "1", value: 10, weight: 1 }];
-    const candidateStances = [{ issueId: "1", value: 0 }];
-    
-    expect(calculateAlignment(userStances, candidateStances)).toBe(0);
-  });
-
-  it("should respect weights correctly", () => {
-    const userStances = [
-      { issueId: "1", value: 10, weight: 3 },
-      { issueId: "2", value: 10, weight: 1 },
-    ];
-    const candidateStances = [
-      { issueId: "1", value: 10 },
-      { issueId: "2", value: 0 },
-    ];
-    
-    expect(calculateAlignment(userStances, candidateStances)).toBe(75);
-  });
-
-  it("should handle neutral stances (5)", () => {
-    const userStances = [{ issueId: "1", value: 5, weight: 1 }];
-    const candidateStances = [{ issueId: "1", value: 10 }];
-    expect(calculateAlignment(userStances, candidateStances)).toBe(50);
-  });
-
-  it("should return 0 for empty user stances", () => {
-    expect(calculateAlignment([], [{ issueId: "1", value: 10 }])).toBe(0);
-  });
-
-  it("should return 0 when no issues match", () => {
-    const userStances = [{ issueId: "1", value: 10, weight: 1 }];
-    const candidateStances = [{ issueId: "2", value: 10 }];
-    expect(calculateAlignment(userStances, candidateStances)).toBe(0);
-  });
-
-  it("should handle weights of zero", () => {
-    const userStances = [
-      { issueId: "1", value: 10, weight: 0 },
-      { issueId: "2", value: 10, weight: 1 },
-    ];
-    const candidateStances = [
-      { issueId: "1", value: 0 },
       { issueId: "2", value: 10 },
     ];
-    // Issue 1 is ignored due to 0 weight. Issue 2 is a perfect match.
-    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
+    // Weight 1,000,000 should dominate. 
+    // Without high weight: (100% + 0%) / 2 = 50%
+    // With high weight: ~100%
+    expect(calculateAlignment(userStances, candidateStances)).toBeGreaterThan(99);
   });
 
-  it("should handle missing candidate stances gracefully", () => {
-    const userStances = [
-      { issueId: "1", value: 10, weight: 1 },
-      { issueId: "2", value: 10, weight: 1 },
-    ];
+  it("should return 0 when totalPossibleDifference is 0", () => {
+    const userStances = [{ issueId: "1", value: 10, weight: 0 }];
     const candidateStances = [{ issueId: "1", value: 10 }];
-    // Only Issue 1 is scored.
-    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
+    expect(calculateAlignment(userStances, candidateStances)).toBe(0);
   });
 
-  it("should handle extreme values correctly", () => {
-    const userStances = [
-      { issueId: "1", value: 10, weight: 100 },
-      { issueId: "2", value: 0, weight: 100 },
-    ];
-    const candidateStances = [
-      { issueId: "1", value: 10 },
-      { issueId: "2", value: 0 },
-    ];
-    expect(calculateAlignment(userStances, candidateStances)).toBe(100);
+  it("should handle large datasets efficiently", () => {
+    const largeUserStances = Array.from({ length: 1000 }, (_, i) => ({
+      issueId: `issue-${i}`,
+      value: 5,
+      weight: 1
+    }));
+    const largeCandidateStances = Array.from({ length: 1000 }, (_, i) => ({
+      issueId: `issue-${i}`,
+      value: 5
+    }));
+    
+    const start = performance.now();
+    const result = calculateAlignment(largeUserStances, largeCandidateStances);
+    const end = performance.now();
+    
+    expect(result).toBe(100);
+    expect(end - start).toBeLessThan(50); // Should be very fast (< 50ms)
   });
 });

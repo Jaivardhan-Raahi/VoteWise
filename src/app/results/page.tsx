@@ -1,14 +1,18 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useState, useEffect, useCallback, Suspense, lazy } from "react";
 import { useSurveyStore } from "@/store/useSurveyStore";
 import { getCandidatesForRace, getIssuesByRace } from "@/lib/registry";
 import { calculateAlignment } from "@/lib/scoring";
 import { useRouter } from "next/navigation";
-import { firebaseService, CommunityStats } from "@/lib/firebase-service";
+import { firebaseService } from "@/lib/firebase-service";
+import { errorHandler, ErrorCategory } from "@/lib/error-handler";
 
 import { ResultCard } from "@/components/ResultCard";
 import { getMatchExplanation } from "@/lib/gemini";
+
+// Lazy load analytics for better performance (Task 4)
+const CommunityInsights = lazy(() => import("@/components/CommunityInsights").then(m => ({ default: m.CommunityInsights })));
 
 export default function ResultsPage() {
   const responses = useSurveyStore((state) => state.responses);
@@ -19,57 +23,77 @@ export default function ResultsPage() {
   const [explanation, setExplanation] = useState<string | null>(null);
   const [loadingExpl, setLoadingExpl] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
-  const [stats, setStats] = useState<CommunityStats | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const results = useMemo(() => {
     if (!currentRaceId) return [];
-    const candidates = getCandidatesForRace(currentRaceId);
-    const userStances = Object.entries(responses).map(([issueId, resp]) => ({
-      issueId,
-      value: resp.value,
-      weight: resp.weight,
-    }));
-    return candidates.map((candidate) => ({
-      candidate,
-      score: calculateAlignment(userStances, candidate.stances)
-    })).sort((a, b) => b.score - a.score).slice(0, 3);
+    
+    try {
+      const candidates = getCandidatesForRace(currentRaceId);
+      const userStances = Object.entries(responses).map(([issueId, resp]) => ({
+        issueId,
+        value: resp.value,
+        weight: resp.weight,
+      }));
+
+      return candidates.map((candidate) => ({
+        candidate,
+        score: calculateAlignment(userStances, candidate.stances)
+      })).sort((a, b) => b.score - a.score).slice(0, 3);
+    } catch (e) {
+      errorHandler.log(e);
+      return [];
+    }
   }, [currentRaceId, responses]);
 
   const topMatch = results[0];
 
+  // Atomic persistence with error handling (Task 1 & 3)
   useEffect(() => {
     if (results.length > 0 && !hasSaved && currentRaceId) {
-      setHasSaved(true);
-      const issues = getIssuesByRace(currentRaceId);
-      const topIssues = Object.entries(responses)
-        .sort((a, b) => b[1].weight - a[1].weight)
-        .slice(0, 3)
-        .map(([issueId]) => issues.find(i => i.id === issueId)?.name || issueId);
+      const persistResults = async () => {
+        setHasSaved(true);
+        try {
+          const issues = getIssuesByRace(currentRaceId);
+          const topIssues = Object.entries(responses)
+            .sort((a, b) => b[1].weight - a[1].weight)
+            .slice(0, 3)
+            .map(([issueId]) => issues.find(i => i.id === issueId)?.name || issueId);
 
-      firebaseService.saveResult({
-        candidateId: topMatch.candidate.id,
-        candidateName: topMatch.candidate.name,
-        raceId: currentRaceId,
-        topIssues,
-        score: topMatch.score,
-      }).then(() => {
-        firebaseService.getRaceStats(currentRaceId).then(setStats);
-      });
+          await firebaseService.saveResult({
+            candidateId: topMatch.candidate.id,
+            candidateName: topMatch.candidate.name,
+            raceId: currentRaceId,
+            topIssues,
+            score: topMatch.score,
+          });
+        } catch (e) {
+          const msg = errorHandler.handle(ErrorCategory.FIREBASE, "Auto-save failed", e);
+          setErrorMessage(msg);
+        }
+      };
+      persistResults();
     }
   }, [results, hasSaved, responses, currentRaceId, topMatch]);
 
   const fetchExplanation = useCallback(async () => {
     if (results.length > 0 && currentRaceId) {
       setLoadingExpl(true);
-      const issues = getIssuesByRace(currentRaceId);
-      const topIssues = Object.entries(responses)
-        .sort((a, b) => b[1].weight - a[1].weight)
-        .slice(0, 3)
-        .map(([id]) => issues.find(i => i.id === id)?.name || id);
+      try {
+        const issues = getIssuesByRace(currentRaceId);
+        const topIssues = Object.entries(responses)
+          .sort((a, b) => b[1].weight - a[1].weight)
+          .slice(0, 3)
+          .map(([id]) => issues.find(i => i.id === id)?.name || id);
 
-      const text = await getMatchExplanation(topMatch.candidate.name, topIssues);
-      setExplanation(text);
-      setLoadingExpl(false);
+        const text = await getMatchExplanation(topMatch.candidate.name, topIssues);
+        setExplanation(text);
+      } catch (e) {
+        errorHandler.handle(ErrorCategory.GEMINI, "AI Fetch failed", e);
+        setExplanation("AI explanation is temporarily unavailable.");
+      } finally {
+        setLoadingExpl(false);
+      }
     }
   }, [results, responses, currentRaceId, topMatch]);
 
@@ -89,20 +113,19 @@ export default function ResultsPage() {
     );
   }
 
-  const scoreDiff = stats ? topMatch.score - stats.averageScore : 0;
-
   return (
     <main className="min-h-screen bg-zinc-50 py-12 px-4">
       <div className="max-w-xl mx-auto space-y-12">
         <header className="text-center space-y-4">
-          <h1 className="text-4xl font-extrabold text-zinc-900">Your Top Matches</h1>
-          {stats && (
-            <p className="text-zinc-500 font-medium">
-              You align <span className="text-zinc-900">{topMatch.score}%</span> with your top match. 
-              The community average is <span className="text-zinc-900">{stats.averageScore}%</span>.
-            </p>
-          )}
+          <h1 className="text-4xl font-extrabold text-zinc-900 tracking-tight">Your Top Matches</h1>
+          <p className="text-lg text-zinc-600">Candidates that align closest with your views.</p>
         </header>
+
+        {errorMessage && (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="space-y-4">
           {results.map(({ candidate, score }) => (
@@ -123,42 +146,10 @@ export default function ResultsPage() {
           )}
         </div>
 
-        {/* Community Insights Grid */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-zinc-900 text-white p-6 rounded-2xl space-y-2">
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Most Matched Candidate</span>
-              <p className="text-xl font-bold">{stats.topCandidate}</p>
-              <p className="text-xs text-zinc-400">Overall community favorite</p>
-            </div>
-            
-            <div className="bg-white border border-zinc-200 p-6 rounded-2xl space-y-2">
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Top Community Issues</span>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {stats.topIssues.map(issue => (
-                  <span key={issue} className="px-2 py-1 bg-zinc-100 text-zinc-600 text-[10px] font-bold rounded uppercase">
-                    {issue}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="md:col-span-2 bg-zinc-100 p-6 rounded-2xl flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Alignment Comparison</span>
-                <p className="text-sm font-bold text-zinc-800">
-                  {scoreDiff > 0 
-                    ? `You are ${scoreDiff}% more aligned than the average user.`
-                    : `You are ${Math.abs(scoreDiff)}% less aligned than the average user.`}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-black text-zinc-900">{topMatch.score}%</span>
-                <span className="text-[10px] block text-zinc-400 font-bold uppercase">Your Score</span>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Community Insights Grid (Lazy Loaded) */}
+        <Suspense fallback={<div className="h-64 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-2xl animate-pulse" />}>
+          <CommunityInsights raceId={currentRaceId} userScore={topMatch.score} />
+        </Suspense>
 
         <div className="flex justify-center pt-8">
           <button 

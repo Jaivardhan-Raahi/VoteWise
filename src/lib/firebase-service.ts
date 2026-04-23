@@ -3,12 +3,13 @@ import {
   collection, 
   addDoc, 
   serverTimestamp, 
-  query, 
-  orderBy, 
-  limit, 
-  getDocs,
-  where
+  doc, 
+  getDoc, 
+  setDoc, 
+  increment,
+  runTransaction
 } from "firebase/firestore";
+import { errorHandler, ErrorCategory } from "./error-handler";
 
 export interface SurveyResultRecord {
   candidateId: string;
@@ -26,90 +27,89 @@ export interface CommunityStats {
   candidateBreakdown: Record<string, number>;
 }
 
-// Simple client-side cache to avoid redundant reads
-let statsCache: { data: CommunityStats; timestamp: number } | null = null;
-const CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+const ANALYTICS_DOC_ID = "community_summary";
 
 export const firebaseService = {
   /**
-   * Saves a survey result to Firestore.
+   * Saves a survey result and atomically updates aggregated analytics.
+   * Implementation of Task 1: Separate raw data vs computed data.
    */
   async saveResult(data: SurveyResultRecord) {
     try {
-      await addDoc(collection(db, "results"), {
-        ...data,
-        timestamp: serverTimestamp(),
+      await runTransaction(db, async (transaction) => {
+        // 1. Save raw result
+        const resultRef = doc(collection(db, "results"));
+        transaction.set(resultRef, {
+          ...data,
+          timestamp: serverTimestamp(),
+        });
+
+        // 2. Update computed analytics
+        const analyticsRef = doc(db, "analytics", `${data.raceId}_${ANALYTICS_DOC_ID}`);
+        const analyticsSnap = await transaction.get(analyticsRef);
+
+        const issueUpdates: Record<string, any> = {};
+        data.topIssues.forEach(issue => {
+          issueUpdates[`issueCounts.${issue}`] = increment(1);
+        });
+
+        if (!analyticsSnap.exists()) {
+          transaction.set(analyticsRef, {
+            candidateCounts: { [data.candidateName]: 1 },
+            issueCounts: data.topIssues.reduce((acc, iss) => ({ ...acc, [iss]: 1 }), {}),
+            totalScore: data.score,
+            count: 1,
+            lastUpdated: serverTimestamp(),
+          });
+        } else {
+          transaction.update(analyticsRef, {
+            [`candidateCounts.${data.candidateName}`]: increment(1),
+            ...issueUpdates,
+            totalScore: increment(data.score),
+            count: increment(1),
+            lastUpdated: serverTimestamp(),
+          });
+        }
       });
-      // Invalidate cache after new submission
-      statsCache = null;
     } catch (error) {
-      console.error("Firestore Save Error:", error);
+      errorHandler.log(new Error(`Failed to save result: ${error}`));
     }
   },
 
   /**
-   * Fetches aggregate stats for a specific race with caching.
+   * Fetches aggregated stats from the analytics collection.
+   * Implementation of Task 4: Efficient read via single document.
    */
-  async getRaceStats(raceId: string): Promise<CommunityStats> {
-    const now = Date.now();
-    if (statsCache && (now - statsCache.timestamp < CACHE_TTL)) {
-      return statsCache.data;
-    }
-
+  async getRaceStats(raceId: string): Promise<CommunityStats | null> {
     try {
-      // Query last 200 results for a representative sample without excessive cost
-      const q = query(
-        collection(db, "results"),
-        where("raceId", "==", raceId),
-        orderBy("timestamp", "desc"),
-        limit(200)
-      );
-      
-      const querySnapshot = await getDocs(q);
-      
-      const candidateCounts: Record<string, number> = {};
-      const issueCounts: Record<string, number> = {};
-      let totalScore = 0;
-      let count = 0;
+      const analyticsRef = doc(db, "analytics", `${raceId}_${ANALYTICS_DOC_ID}`);
+      const snap = await getDoc(analyticsRef);
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        totalScore += data.score || 0;
-        count++;
+      if (!snap.exists()) return null;
 
-        candidateCounts[data.candidateName] = (candidateCounts[data.candidateName] || 0) + 1;
-        data.topIssues?.forEach((issue: string) => {
-          issueCounts[issue] = (issueCounts[issue] || 0) + 1;
-        });
-      });
+      const data = snap.data();
+      const candidateCounts = data.candidateCounts || {};
+      const issueCounts = data.issueCounts || {};
+      const count = data.count || 0;
 
       const topIssues = Object.entries(issueCounts)
-        .sort((a, b) => b[1] - a[1])
+        .sort((a: any, b: any) => b[1] - a[1])
         .slice(0, 3)
         .map(([name]) => name);
 
       const topCandidate = Object.entries(candidateCounts)
-        .sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+        .sort((a: any, b: any) => b[1] - a[1])[0]?.[0] || "N/A";
 
-      const data: CommunityStats = {
+      return {
         topCandidate,
         topIssues,
-        averageScore: count > 0 ? Math.round(totalScore / count) : 0,
+        averageScore: count > 0 ? Math.round(data.totalScore / count) : 0,
         totalSubmissions: count,
         candidateBreakdown: candidateCounts
       };
-
-      statsCache = { data, timestamp: now };
-      return data;
     } catch (error) {
-      console.error("Firestore Read Error:", error);
-      return {
-        topCandidate: "N/A",
-        topIssues: [],
-        averageScore: 0,
-        totalSubmissions: 0,
-        candidateBreakdown: {}
-      };
+      errorHandler.handle(ErrorCategory.FIREBASE, "Failed to fetch analytics", error);
+      return null;
     }
   }
 };
