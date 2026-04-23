@@ -11,16 +11,15 @@
 - [ ] **UI-03**: Responsive, mobile-first design following the "Bite-Snack-Meal" hierarchy.
 
 ### Location & Context
-- [ ] **LOC-01**: User can enter an address/ZIP to identify relevant candidate races.
-- [ ] **LOC-02**: User can select a specific race to begin alignment matching.
+- [ ] **LOC-01**: User can select a specific race to begin alignment matching (hardcoded list or manual selection for MVP).
 
 ### Survey & Stances
-- [ ] **SURV-01**: Multi-step survey using a 5-point Likert scale (Strongly Disagree to Strongly Agree).
+- [ ] **SURV-01**: Multi-step survey using a 0–10 scale for user and candidate stances.
 - [ ] **SURV-02**: User can assign weights (e.g., Low, Medium, High importance) to specific issues.
 - [ ] **SURV-03**: Client-side survey state persistence using Zustand and localStorage (Privacy-First).
 
 ### Alignment & Comparison
-- [ ] **ALGN-01**: Scoring engine using Weighted Manhattan Distance for intuitive matching.
+- [ ] **ALGN-01**: Scoring engine using simple weighted sum scoring for alignment calculation.
 - [ ] **ALGN-02**: Proximity visualization showing alignment percentage per candidate.
 - [ ] **ALGN-03**: Side-by-side "Snackable" comparison view of candidate stances.
 
@@ -29,6 +28,9 @@
 - [ ] **DATA-02**: Transparent sourcing: Every stance must have a verified source URL.
 
 ## v2 Requirements
+
+### Location & Context
+- **LOC-02**: User can enter an address/ZIP to identify relevant candidate races (automatic lookup).
 
 ### Advanced Alignment
 - **SURV-04**: "Blind Matching" mode (candidates revealed only after survey completion).
@@ -53,7 +55,6 @@
 | UI-02 | Phase 3 | Pending |
 | UI-03 | Phase 3 | Pending |
 | LOC-01 | Phase 1 | Pending |
-| LOC-02 | Phase 1 | Pending |
 | SURV-01 | Phase 2 | Pending |
 | SURV-02 | Phase 2 | Pending |
 | SURV-03 | Phase 2 | Pending |

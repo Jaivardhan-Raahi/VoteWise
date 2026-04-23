@@ -1,4 +1,4 @@
-﻿# Phase 01: Foundation & Candidate Data - Discussion Log
+# Phase 01: Foundation & Candidate Data - Discussion Log
 
 > **Audit trail only.** Do not use as input to planning, research, or execution agents.
 
@@ -12,11 +12,11 @@
 [auto] Selected: Static JSON assets (Recommended for MVP data integrity).
 
 ## Matching Logic
-[auto] Selected: Weighted Manhattan Distance (Recommended for intuitive matching).
+[user-refined] Selected: Simple weighted sum scoring (replaced Weighted Manhattan Distance).
+[user-refined] Selected: 0–10 scale for stances (replaced -2 to 2 Likert scale).
 
 ## Location UX
-[auto] Selected: ZIP code entry (Recommended for MVP simplicity).
+[user-refined] Selected: Optional/Removed for initial MVP (replaced ZIP code entry).
 
 ## Content Depth
 [auto] Selected: Bite-sized summaries with source links (Recommended per research).
-

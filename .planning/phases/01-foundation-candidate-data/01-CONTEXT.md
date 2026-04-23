@@ -18,14 +18,11 @@ This phase delivers the data foundation and core matching logic for VoteWise. It
 - **D-02**: Every stance MUST include a verified source URL for transparency.
 
 ### Matching Logic
-- **D-03**: Implement Weighted Manhattan Distance for alignment scoring.
-- **D-04**: Use a 5-point Likert scale (Value range: -2 to 2) for stances.
-
-### Location UX
-- **D-05**: Implement ZIP code-based race selection for the MVP.
+- **D-03**: Implement simple weighted sum scoring for alignment calculation.
+- **D-04**: Use a 0–10 scale for both user stances and candidate positions.
 
 ### Content Depth
-- **D-06**: Stances are stored as "Bite-sized" summaries (max 280 chars) to maintain minimalism.
+- **D-05**: Stances are stored as "Bite-sized" summaries (max 280 chars) to maintain minimalism.
 
 </decisions>
 
@@ -35,14 +32,14 @@ This phase delivers the data foundation and core matching logic for VoteWise. It
 **Downstream agents MUST read these before planning or implementing.**
 
 ### Project Core
-- \.planning/PROJECT.md\ — High-level goals and constraints.
-- \.planning/REQUIREMENTS.md\ — Functional requirements for Phase 1.
-- \.planning/ROADMAP.md\ — Phase structure and success criteria.
+- \`.planning/PROJECT.md\` — High-level goals and constraints.
+- \`.planning/REQUIREMENTS.md\` — Functional requirements for Phase 1.
+- \`.planning/ROADMAP.md\` — Phase structure and success criteria.
 
 ### Research
-- \.planning/research/SUMMARY.md\ — Ecosystem synthesis.
-- \.planning/research/ARCHITECTURE.md\ — System structure and data flow.
-- \.planning/research/STACK.md\ — Recommended tech stack.
+- \`.planning/research/SUMMARY.md\` — Ecosystem synthesis.
+- \`.planning/research/ARCHITECTURE.md\` — System structure and data flow.
+- \`.planning/research/STACK.md\` — Recommended tech stack.
 
 </canonical_refs>
 
@@ -62,6 +59,7 @@ This phase delivers the data foundation and core matching logic for VoteWise. It
 
 <deferred>
 ## Deferred Ideas
+- Location input (ZIP/Address) — Deferred or optional for initial MVP to focus on core matching.
 - Dynamic API integration (Google Civic) — Deferred to v2.
 - Blind matching mode — Deferred to v2.
 
