@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-This phase delivers the data foundation and core matching logic for VoteWise. It includes candidate data schemas, the scoring engine implementation, and location-based race selection.
+This phase delivers the data foundation and core matching logic.
 
 </domain>
 
