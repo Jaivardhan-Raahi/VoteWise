@@ -20,11 +20,14 @@ export async function getMatchExplanation(candidateName: string, topIssues: stri
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
-      A user has been matched with political candidate ${candidateName}. 
-      The user's top prioritized issues are: ${topIssues.join(", ")}.
-      Write a brief, 2-line explanation of why this is a good match based on these priorities.
-      Keep it neutral, objective, and concise. 
-      Format: "You prioritized [Issues]. ${candidateName} aligns with these because..."
+      Match Summary: User matched with ${candidateName}.
+      Top User Priorities: ${topIssues.join(", ")}.
+      
+      Task: Explain the alignment in exactly 2 concise sentences. 
+      Focus on how ${candidateName}'s core platform directly addresses the specified issues. 
+      Maintain a neutral, objective, and authoritative tone.
+      
+      Format: "Your match with ${candidateName} is driven by your focus on ${topIssues.join(" and ")}. Their platform aligns with these views by..."
     `.trim();
 
     console.log("Gemini Debug: Request payload prompt:", prompt);
