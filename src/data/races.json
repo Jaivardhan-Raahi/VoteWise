@@ -1,0 +1,8 @@
+[
+  {
+    "id": "pres-2024",
+    "name": "Presidential Election 2024",
+    "description": "The general election for the President of the United States.",
+    "candidates": ["cand-001", "cand-002"]
+  }
+]

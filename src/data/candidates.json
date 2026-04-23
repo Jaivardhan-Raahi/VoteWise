@@ -1,0 +1,54 @@
+[
+  {
+    "id": "cand-001",
+    "name": "Jane Doe",
+    "party": "Reform",
+    "imageUrl": "https://example.com/jane-doe.jpg",
+    "stances": [
+      {
+        "issueId": "climate",
+        "value": 8,
+        "sourceUrl": "https://example.com/jane-doe-climate-policy",
+        "quote": "We must accelerate the transition to renewable energy by 2035."
+      },
+      {
+        "issueId": "economy",
+        "value": 3,
+        "sourceUrl": "https://example.com/jane-doe-economy",
+        "quote": "A strong economy requires fiscal responsibility and targeted tax breaks."
+      },
+      {
+        "issueId": "education",
+        "value": 9,
+        "sourceUrl": "https://example.com/jane-doe-education",
+        "quote": "Education is a right; we will double funding for public schools."
+      }
+    ]
+  },
+  {
+    "id": "cand-002",
+    "name": "John Smith",
+    "party": "Traditional",
+    "imageUrl": "https://example.com/john-smith.jpg",
+    "stances": [
+      {
+        "issueId": "climate",
+        "value": 2,
+        "sourceUrl": "https://example.com/john-smith-climate",
+        "quote": "Energy independence through all sources, including fossil fuels."
+      },
+      {
+        "issueId": "economy",
+        "value": 7,
+        "sourceUrl": "https://example.com/john-smith-economy",
+        "quote": "Deregulation is the key to unlocking true economic potential."
+      },
+      {
+        "issueId": "education",
+        "value": 4,
+        "sourceUrl": "https://example.com/john-smith-education",
+        "quote": "Focus on school choice and competitive standards."
+      }
+    ]
+  }
+]
