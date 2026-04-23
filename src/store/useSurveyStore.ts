@@ -7,6 +7,7 @@ export const useSurveyStore = create<SurveyState & SurveyActions>()(
     (set) => ({
       responses: {},
       currentRaceId: null,
+      currentStep: 0,
 
       setAnswer: (issueId, value) =>
         set((state) => ({
@@ -32,7 +33,9 @@ export const useSurveyStore = create<SurveyState & SurveyActions>()(
 
       setRace: (raceId) => set({ currentRaceId: raceId }),
 
-      resetSurvey: () => set({ responses: {}, currentRaceId: null }),
+      setCurrentStep: (step) => set({ currentStep: step }),
+
+      resetSurvey: () => set({ responses: {}, currentRaceId: null, currentStep: 0 }),
     }),
     {
       name: "vote-wise-survey-storage",

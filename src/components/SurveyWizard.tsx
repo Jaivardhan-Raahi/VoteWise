@@ -5,6 +5,7 @@ import { getIssuesByRace } from "../lib/registry";
 import { Issue } from "../types/schema";
 import { QuestionCard } from "./QuestionCard";
 import { useSurveyStore } from "../store/useSurveyStore";
+import { useRouter } from "next/navigation";
 
 interface SurveyWizardProps {
   raceId: string;
@@ -12,8 +13,10 @@ interface SurveyWizardProps {
 
 export const SurveyWizard: React.FC<SurveyWizardProps> = ({ raceId }) => {
   const [issues, setIssues] = useState<Issue[]>([]);
-  const [currentStep, setCurrentStep] = useState(0);
+  const currentStep = useSurveyStore((state) => state.currentStep);
+  const setCurrentStep = useSurveyStore((state) => state.setCurrentStep);
   const setRace = useSurveyStore((state) => state.setRace);
+  const router = useRouter();
 
   useEffect(() => {
     const raceIssues = getIssuesByRace(raceId);
@@ -37,9 +40,7 @@ export const SurveyWizard: React.FC<SurveyWizardProps> = ({ raceId }) => {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     } else {
-      // Placeholder for results navigation
-      console.log("Survey complete!");
-      alert("Survey complete! In a real app, this would take you to the results page.");
+      router.push("/results");
     }
   };
 

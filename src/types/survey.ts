@@ -6,11 +6,13 @@ export interface UserResponse {
 export interface SurveyState {
   responses: Record<string, UserResponse>; // issueId -> UserResponse
   currentRaceId: string | null;
+  currentStep: number;
 }
 
 export interface SurveyActions {
   setAnswer: (issueId: string, value: number) => void;
   setWeight: (issueId: string, weight: number) => void;
   setRace: (raceId: string) => void;
+  setCurrentStep: (step: number) => void;
   resetSurvey: () => void;
 }

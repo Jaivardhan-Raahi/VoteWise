@@ -1,8 +1,12 @@
-export interface IssueScore {
+export interface UserStance {
   issueId: string;
-  userValue: number;
-  candidateValue: number;
+  value: number;
   weight: number;
+}
+
+export interface CandidateStance {
+  issueId: string;
+  value: number;
 }
 
 /**
@@ -11,16 +15,25 @@ export interface IssueScore {
  * where diff = abs(userValue - candidateValue)
  * and maxSumWeightedDiff = sum(10 * weight)
  */
-export function calculateAlignment(scores: IssueScore[]): number {
-  if (scores.length === 0) return 0;
+export function calculateAlignment(
+  userStances: UserStance[],
+  candidateStances: CandidateStance[]
+): number {
+  if (userStances.length === 0) return 0;
 
   let sumWeightedDiff = 0;
   let maxSumWeightedDiff = 0;
 
-  for (const score of scores) {
-    const diff = Math.abs(score.userValue - score.candidateValue);
-    sumWeightedDiff += diff * score.weight;
-    maxSumWeightedDiff += 10 * score.weight;
+  for (const userStance of userStances) {
+    const candidateStance = candidateStances.find(
+      (cs) => cs.issueId === userStance.issueId
+    );
+
+    if (!candidateStance) continue;
+
+    const diff = Math.abs(userStance.value - candidateStance.value);
+    sumWeightedDiff += diff * userStance.weight;
+    maxSumWeightedDiff += 10 * userStance.weight;
   }
 
   if (maxSumWeightedDiff === 0) return 0;

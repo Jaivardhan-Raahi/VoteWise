@@ -43,6 +43,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ issue }) => {
           step="1"
           value={value}
           onChange={(e) => setAnswer(issue.id, parseInt(e.target.value, 10))}
+          aria-label={`Your stance on ${issue.name}`}
+          aria-valuetext={`${value} out of 10`}
           className="w-full h-2 bg-zinc-100 rounded-lg appearance-none cursor-pointer accent-zinc-900"
         />
         <div className="flex justify-between text-xs text-zinc-400 font-medium px-1">
