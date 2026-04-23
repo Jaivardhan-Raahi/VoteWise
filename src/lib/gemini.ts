@@ -2,14 +2,16 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
-
 export async function getMatchExplanation(candidateName: string, topIssues: string[]) {
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  
+  if (!apiKey) {
     return "Explanation unavailable (API key missing).";
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  // Lazy-load client to keep startup memory low
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
     A user has been matched with political candidate ${candidateName}. 
