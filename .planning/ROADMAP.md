@@ -17,8 +17,8 @@
   2. Scoring engine calculates alignment percentages accurately based on candidate data (0-10 scale).
   3. Candidate data schema includes verified source URLs for all political stances.
 **Plans**: 2 plans
-- [ ] 01-01-PLAN.md — Initialize Next.js 15 project and define data schemas/seed data.
-- [ ] 01-02-PLAN.md — Implement alignment scoring engine and data registry utility.
+- [x] 01-01-PLAN.md — Initialize Next.js 15 project and define data schemas/seed data.
+- [x] 01-02-PLAN.md — Implement alignment scoring engine and data registry utility.
 
 ### Phase 2: Survey Core
 **Goal**: Implement the primary user interaction for capturing political stances.
@@ -55,7 +55,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Candidate Data | 0/2 | Not started | - |
+| 1. Foundation & Candidate Data | 2/2 | Completed | 2026-04-23 |
 | 2. Survey Core | 0/1 | Not started | - |
 | 3. Warm Civic UI | 0/1 | Not started | - |
 | 4. Alignment Results & Comparison | 0/1 | Not started | - |

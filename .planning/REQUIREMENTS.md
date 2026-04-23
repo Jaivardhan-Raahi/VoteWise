@@ -11,7 +11,7 @@
 - [ ] **UI-03**: Responsive, mobile-first design following the "Bite-Snack-Meal" hierarchy.
 
 ### Location & Context
-- [ ] **LOC-01**: User can select a specific race to begin alignment matching (hardcoded list or manual selection for MVP).
+- [x] **LOC-01**: User can select a specific race to begin alignment matching (hardcoded list or manual selection for MVP).
 
 ### Survey & Stances
 - [ ] **SURV-01**: Multi-step survey using a 0–10 scale for user and candidate stances.
@@ -19,13 +19,13 @@
 - [ ] **SURV-03**: Client-side survey state persistence using Zustand and localStorage (Privacy-First).
 
 ### Alignment & Comparison
-- [ ] **ALGN-01**: Scoring engine using simple weighted sum scoring for alignment calculation.
+- [x] **ALGN-01**: Scoring engine using simple weighted sum scoring for alignment calculation.
 - [ ] **ALGN-02**: Proximity visualization showing alignment percentage per candidate.
 - [ ] **ALGN-03**: Side-by-side "Snackable" comparison view of candidate stances.
 
 ### Candidate Data
-- [ ] **DATA-01**: Static JSON schema for candidate profiles, stances, and source links.
-- [ ] **DATA-02**: Transparent sourcing: Every stance must have a verified source URL.
+- [x] **DATA-01**: Static JSON schema for candidate profiles, stances, and source links.
+- [x] **DATA-02**: Transparent sourcing: Every stance must have a verified source URL.
 
 ## v2 Requirements
 
@@ -54,15 +54,15 @@
 | UI-01 | Phase 3 | Pending |
 | UI-02 | Phase 3 | Pending |
 | UI-03 | Phase 3 | Pending |
-| LOC-01 | Phase 1 | Pending |
+| LOC-01 | Phase 1 | Completed |
 | SURV-01 | Phase 2 | Pending |
 | SURV-02 | Phase 2 | Pending |
 | SURV-03 | Phase 2 | Pending |
-| ALGN-01 | Phase 1 | Pending |
+| ALGN-01 | Phase 1 | Completed |
 | ALGN-02 | Phase 4 | Pending |
 | ALGN-03 | Phase 4 | Pending |
-| DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Completed |
+| DATA-02 | Phase 1 | Completed |
 
 **Coverage:**
 - v1 requirements: 13 total
