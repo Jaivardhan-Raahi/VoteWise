@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Public_Sans } from "next/font/google";
 import "./globals.css";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const publicSans = Public_Sans({
   variable: "--font-public-sans",
@@ -23,7 +24,9 @@ export default function RootLayout({
       className={`${publicSans.variable} h-full antialiased font-sans`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   );

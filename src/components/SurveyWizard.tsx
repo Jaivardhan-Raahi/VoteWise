@@ -52,7 +52,7 @@ export const SurveyWizard: React.FC<SurveyWizardProps> = ({ raceId }) => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" data-testid="survey-container">
       {/* Progress Header */}
       <div className="space-y-4">
         <div className="flex justify-between items-end">
@@ -79,6 +79,7 @@ export const SurveyWizard: React.FC<SurveyWizardProps> = ({ raceId }) => {
         <button
           onClick={prev}
           disabled={currentStep === 0}
+          data-testid="prev-btn"
           className={`px-6 py-3 rounded-lg font-semibold transition-all ${
             currentStep === 0
               ? "text-zinc-300 cursor-not-allowed"
@@ -89,6 +90,7 @@ export const SurveyWizard: React.FC<SurveyWizardProps> = ({ raceId }) => {
         </button>
         <button
           onClick={next}
+          data-testid="next-btn"
           className="px-8 py-3 bg-zinc-900 text-white rounded-lg font-semibold hover:bg-zinc-800 transition-all shadow-lg active:transform active:scale-95"
         >
           {currentStep === issues.length - 1 ? "View Results" : "Next →"}

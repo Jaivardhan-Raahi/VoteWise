@@ -4,8 +4,7 @@ import {
   addDoc, 
   serverTimestamp, 
   doc, 
-  getDoc, 
-  setDoc, 
+  getDocs,
   increment,
   runTransaction
 } from "firebase/firestore";
@@ -27,12 +26,11 @@ export interface CommunityStats {
   candidateBreakdown: Record<string, number>;
 }
 
-const ANALYTICS_DOC_ID = "community_summary";
+const NUM_SHARDS = 10;
 
 export const firebaseService = {
   /**
-   * Saves a survey result and atomically updates aggregated analytics.
-   * Implementation of Task 1: Separate raw data vs computed data.
+   * Saves a survey result and atomically updates aggregated analytics using distributed counters.
    */
   async saveResult(data: SurveyResultRecord) {
     try {
@@ -44,8 +42,9 @@ export const firebaseService = {
           timestamp: serverTimestamp(),
         });
 
-        // 2. Update computed analytics
-        const analyticsRef = doc(db, "analytics", `${data.raceId}_${ANALYTICS_DOC_ID}`);
+        // 2. Update computed analytics (Distributed Counter)
+        const shardId = Math.floor(Math.random() * NUM_SHARDS).toString();
+        const analyticsRef = doc(db, "analytics", data.raceId, "shards", shardId);
         const analyticsSnap = await transaction.get(analyticsRef);
 
         const issueUpdates: Record<string, any> = {};
@@ -77,20 +76,36 @@ export const firebaseService = {
   },
 
   /**
-   * Fetches aggregated stats from the analytics collection.
-   * Implementation of Task 4: Efficient read via single document.
+   * Fetches aggregated stats by summing all shards.
    */
   async getRaceStats(raceId: string): Promise<CommunityStats | null> {
     try {
-      const analyticsRef = doc(db, "analytics", `${raceId}_${ANALYTICS_DOC_ID}`);
-      const snap = await getDoc(analyticsRef);
+      const shardsRef = collection(db, "analytics", raceId, "shards");
+      const snap = await getDocs(shardsRef);
 
-      if (!snap.exists()) return null;
+      if (snap.empty) return null;
 
-      const data = snap.data();
-      const candidateCounts = data.candidateCounts || {};
-      const issueCounts = data.issueCounts || {};
-      const count = data.count || 0;
+      const candidateCounts: Record<string, number> = {};
+      const issueCounts: Record<string, number> = {};
+      let totalScore = 0;
+      let count = 0;
+
+      snap.forEach((doc) => {
+        const data = doc.data();
+        totalScore += data.totalScore || 0;
+        count += data.count || 0;
+
+        if (data.candidateCounts) {
+          for (const [cand, candCount] of Object.entries(data.candidateCounts)) {
+            candidateCounts[cand] = (candidateCounts[cand] || 0) + (candCount as number);
+          }
+        }
+        if (data.issueCounts) {
+          for (const [iss, issCount] of Object.entries(data.issueCounts)) {
+            issueCounts[iss] = (issueCounts[iss] || 0) + (issCount as number);
+          }
+        }
+      });
 
       const topIssues = Object.entries(issueCounts)
         .sort((a: any, b: any) => b[1] - a[1])
@@ -103,7 +118,7 @@ export const firebaseService = {
       return {
         topCandidate,
         topIssues,
-        averageScore: count > 0 ? Math.round(data.totalScore / count) : 0,
+        averageScore: count > 0 ? Math.round(totalScore / count) : 0,
         totalSubmissions: count,
         candidateBreakdown: candidateCounts
       };

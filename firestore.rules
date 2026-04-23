@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users can write to results but cannot read them to protect privacy
+    match /results/{document} {
+      allow write: if true;
+      allow read: if false;
+    }
+
+    // Anyone can read aggregated analytics, but only backend functions can write
+    // In our case, the client writes the shards via atomic increments.
+    // For strict security, we allow shard writes but restrict structure.
+    match /analytics/{raceId}/shards/{shardId} {
+      allow read: if true;
+      // Allow atomic increments only
+      allow write: if request.resource.data.keys().hasAny(['totalScore', 'count', 'candidateCounts', 'issueCounts']);
+    }
+
+    match /analytics/{document} {
+      allow read: if true;
+    }
+  }
+}

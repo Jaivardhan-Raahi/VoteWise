@@ -25,10 +25,27 @@ export default function LandingPage() {
           </Link>
         </div>
 
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
+          <div className="p-6 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-2 text-left">
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Retrieval-Augmented AI</h3>
+            <p className="text-sm font-bold text-zinc-900 leading-tight">Grounded results powered by Gemini 1.5 & Verified Data.</p>
+          </div>
+          <div className="p-6 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-2 text-left">
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Distributed Counters</h3>
+            <p className="text-sm font-bold text-zinc-900 leading-tight">High-concurrency community insights via Firestore.</p>
+          </div>
+          <div className="p-6 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-2 text-left">
+            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Privacy Focused</h3>
+            <p className="text-sm font-bold text-zinc-900 leading-tight">No personal identifiers. Only stances are quantified.</p>
+          </div>
+        </section>
+
         <footer className="pt-12 border-t border-zinc-100">
-          <p className="text-sm font-semibold text-zinc-400 uppercase tracking-widest">
-            Privacy First. Results are anonymized for community insights.
-          </p>
+          <div className="flex flex-col items-center space-y-4">
+            <p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest">
+              Tech Stack: Next.js 15 • Firebase • Gemini • Playwright • Vitest
+            </p>
+          </div>
         </footer>
       </div>
     </main>
