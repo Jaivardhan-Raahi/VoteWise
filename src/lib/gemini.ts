@@ -17,7 +17,7 @@ export async function getMatchExplanation(candidateName: string, topIssues: stri
     const genAI = new GoogleGenerativeAI(apiKey);
     
     // Updated to the newest high-performance model (Gemini 2.0 Flash)
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `
       A user has been matched with political candidate ${candidateName}. 
