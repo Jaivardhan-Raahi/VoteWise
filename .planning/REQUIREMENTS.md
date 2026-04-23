@@ -1,4 +1,4 @@
-﻿# Requirements: VoteWise
+# Requirements: VoteWise
 
 **Defined**: 2026-04-23
 **Core Value**: Objective, distraction-free determination of voter alignment with candidates.
@@ -66,7 +66,7 @@
 **Coverage:**
 - v1 requirements: 13 total
 - Mapped to phases: 13
-- Unmapped: 0 âœ“
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-23*
