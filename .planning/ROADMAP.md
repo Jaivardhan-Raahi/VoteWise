@@ -29,7 +29,7 @@
   2. User can assign importance weights (Low/Med/High) to specific issues.
   3. Survey state persists locally in the browser and survives page refreshes (Privacy-First).
 **Plans**: 2 plans
-- [ ] 02-01-PLAN.md — Establish the persistent survey state and issue metadata.
+- [x] 02-01-PLAN.md — Establish the persistent survey state and issue metadata.
 - [ ] 02-02-PLAN.md — Implement the survey wizard UI and question components.
 
 ### Phase 3: Warm Civic UI
@@ -58,6 +58,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Candidate Data | 2/2 | Completed | 2026-04-23 |
-| 2. Survey Core | 0/2 | Not started | - |
+| 2. Survey Core | 1/2 | In Progress | - |
 | 3. Warm Civic UI | 0/1 | Not started | - |
 | 4. Alignment Results & Comparison | 0/1 | Not started | - |

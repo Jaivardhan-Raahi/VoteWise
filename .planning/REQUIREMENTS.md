@@ -16,7 +16,7 @@
 ### Survey & Stances
 - [ ] **SURV-01**: Multi-step survey using a 0–10 scale for user and candidate stances.
 - [ ] **SURV-02**: User can assign weights (e.g., Low, Medium, High importance) to specific issues.
-- [ ] **SURV-03**: Client-side survey state persistence using Zustand and localStorage (Privacy-First).
+- [x] **SURV-03**: Client-side survey state persistence using Zustand and localStorage (Privacy-First).
 
 ### Alignment & Comparison
 - [x] **ALGN-01**: Scoring engine using simple weighted sum scoring for alignment calculation.
@@ -57,7 +57,7 @@
 | LOC-01 | Phase 1 | Completed |
 | SURV-01 | Phase 2 | Pending |
 | SURV-02 | Phase 2 | Pending |
-| SURV-03 | Phase 2 | Pending |
+| SURV-03 | Phase 2 | Completed |
 | ALGN-01 | Phase 1 | Completed |
 | ALGN-02 | Phase 4 | Pending |
 | ALGN-03 | Phase 4 | Pending |
